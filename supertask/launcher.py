@@ -56,16 +56,15 @@ def _show_progress(parent, title, message):
     progress.pack()
     progress.start(15)
 
-    # Center on parent
+    # Center on screen (parent window may be withdrawn/minimized,
+    # giving unreliable coordinates like 0,0 or 1x1)
     dialog.update_idletasks()
-    pw = parent.winfo_width()
-    ph = parent.winfo_height()
-    px = parent.winfo_x()
-    py = parent.winfo_y()
     dw = dialog.winfo_width()
     dh = dialog.winfo_height()
-    x = px + (pw - dw) // 2
-    y = py + (ph - dh) // 2
+    sw = dialog.winfo_screenwidth()
+    sh = dialog.winfo_screenheight()
+    x = (sw - dw) // 2
+    y = (sh - dh) // 2
     dialog.geometry(f'+{x}+{y}')
 
     # Prevent closing via window manager
@@ -145,8 +144,11 @@ class _InitThread(threading.Thread):
                 brief_addon=brief_addon,
             )
 
+            # Prompt is piped via stdin (input= parameter), NOT passed as
+            # a CLI argument.  This avoids Windows cmd.exe/.cmd wrapper
+            # quoting issues with special characters in the prompt text.
             cmd = [
-                self.claude_cli, '-p', prompt,
+                self.claude_cli,
                 '--dangerously-skip-permissions',
                 '--model', model,
                 '--max-turns', '100',
@@ -162,6 +164,7 @@ class _InitThread(threading.Thread):
                     cmd,
                     cwd=str(v_dir),
                     env=env,
+                    input=prompt,
                     capture_output=True,
                     text=True,
                     encoding='utf-8',

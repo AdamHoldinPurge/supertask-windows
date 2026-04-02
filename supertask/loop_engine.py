@@ -175,8 +175,13 @@ class LoopEngine(threading.Thread):
                     timeout: int | None = None) -> int:
         """Run the claude CLI as a subprocess and capture output.
 
+        Pipes the prompt via stdin to avoid Windows cmd.exe quoting issues
+        (nested quotes in prompt text break argument parsing through .cmd
+        batch wrappers, causing flags like --dangerously-skip-permissions
+        to be silently dropped).
+
         Args:
-            prompt: The full prompt text to pass via -p.
+            prompt: The full prompt text, piped via stdin.
             cwd: Working directory for the subprocess.
             log_file: Path to write stdout+stderr output.
             timeout: Subprocess timeout in seconds (default: DEFAULT_TIMEOUT).
@@ -188,8 +193,11 @@ class LoopEngine(threading.Thread):
         if IS_WINDOWS:
             env['PATH'] = os.environ.get('PATH', '')
 
+        # Prompt is piped via stdin (input= parameter), NOT passed as a
+        # CLI argument.  This avoids all Windows cmd.exe/.cmd wrapper
+        # quoting issues with special characters in the prompt text.
         cmd = [
-            self.claude_cli, '-p', prompt,
+            self.claude_cli,
             '--dangerously-skip-permissions',
             '--model', self.model,
             '--max-turns', '100',
@@ -203,6 +211,7 @@ class LoopEngine(threading.Thread):
 
             result = subprocess.run(
                 cmd, cwd=str(cwd), env=env,
+                input=prompt,
                 capture_output=True, text=True,
                 encoding='utf-8',
                 timeout=timeout or DEFAULT_TIMEOUT,

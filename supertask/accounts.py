@@ -24,7 +24,7 @@ def get_accounts():
         return accounts
 
     # Check default config dir first
-    default_account = _probe_account(claude_cli, DEFAULT_CLAUDE_CONFIG)
+    default_account = probe_account(claude_cli, DEFAULT_CLAUDE_CONFIG)
     if default_account:
         accounts.append(default_account)
 
@@ -34,14 +34,14 @@ def get_accounts():
         config_dir = entry.get("config_dir", "")
         if not config_dir or config_dir == DEFAULT_CLAUDE_CONFIG:
             continue
-        account = _probe_account(claude_cli, config_dir)
+        account = probe_account(claude_cli, config_dir)
         if account:
             accounts.append(account)
 
     return accounts
 
 
-def _probe_account(claude_cli, config_dir):
+def probe_account(claude_cli, config_dir):
     """Run claude auth status --json for a given config dir.
 
     Returns:
@@ -168,7 +168,7 @@ def get_login_command(config_dir):
         Shell command string ready to execute in a terminal.
     """
     if IS_WINDOWS:
-        return f"set CLAUDE_CONFIG_DIR={config_dir} && claude auth login"
+        return f'set "CLAUDE_CONFIG_DIR={config_dir}" && claude auth login'
     else:
         return f"CLAUDE_CONFIG_DIR='{config_dir}' claude auth login"
 

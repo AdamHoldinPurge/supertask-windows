@@ -5,11 +5,11 @@ from tkinter import ttk, filedialog, messagebox
 
 from supertask.constants import (
     MODEL_OPTIONS, MODE_OPTIONS, MAX_CYCLES_OPTIONS, MAX_ITERS_OPTIONS,
-    TIME_LIMIT_OPTIONS, TIME_LIMIT_MAP, ICON_PATH,
+    TIME_LIMIT_OPTIONS, TIME_LIMIT_MAP, ICON_PATH, find_claude_cli,
 )
 from supertask.accounts import (
     get_accounts, login_new_account, find_next_slot,
-    get_login_command, save_account,
+    get_login_command, save_account, probe_account,
 )
 from supertask.preset_picker import pick_preset
 from supertask.website_brief import WebsiteBriefDialog
@@ -474,7 +474,6 @@ class ConfigDialog(tk.Toplevel):
                 "All 20 account slots are in use. Remove an account before adding a new one.",
                 parent=self,
             )
-            # Reset selection to first account (or nothing)
             if self._accounts:
                 self._account_combo.current(0)
             else:
@@ -491,21 +490,29 @@ class ConfigDialog(tk.Toplevel):
             parent=self,
         )
 
-        # Re-probe accounts to detect the new login
-        old_count = len(self._accounts)
-        self._refresh_accounts()
+        # Directly probe the NEW config dir (not a generic refresh,
+        # which only checks dirs already in accounts.json)
+        claude_cli = find_claude_cli()
+        result = probe_account(claude_cli, config_dir) if claude_cli else None
 
-        # Check if a new account appeared
-        if len(self._accounts) > old_count:
-            # Select the newly added account (last real entry)
-            self._account_combo.current(len(self._accounts) - 1)
-
-            # Persist it
-            newest = self._accounts[-1]
-            email, plan, cfg = newest
+        if result:
+            email, plan, cfg = result
             save_account(slot, email, plan, cfg)
+            self._refresh_accounts()
+            # Select the newly added account
+            for i, (e, p, c) in enumerate(self._accounts):
+                if str(c) == str(cfg):
+                    self._account_combo.current(i)
+                    break
         else:
-            # Login was not detected; revert selection
+            messagebox.showwarning(
+                "Login Not Detected",
+                "Could not verify the login.\n\n"
+                "Make sure you ran the command in a terminal and\n"
+                "completed the login process before clicking OK.\n\n"
+                "You can try again by selecting '+ Add Account'.",
+                parent=self,
+            )
             if self._accounts:
                 self._account_combo.current(0)
             else:

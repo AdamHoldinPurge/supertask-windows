@@ -10,18 +10,18 @@ import logging
 from datetime import datetime
 from pathlib import Path
 
-from .constants import (
+from supertask.constants import (
     DEFAULT_INTERVAL, DEFAULT_TIMEOUT, DEFAULT_REPLAN_TIMEOUT,
     DEFAULT_REPLAN_PAUSE, MAX_RALPH_ITERS_PER_CYCLE, IS_WINDOWS,
     find_claude_cli,
 )
-from .process_manager import create_lock, remove_lock
-from .prompts import (
+from supertask.process_manager import create_lock, remove_lock
+from supertask.prompts import (
     build_ralph_prompt, build_replan_prompt, build_polish_prompt,
     build_time_context, build_creative_injection, build_brief_addon,
     WEBSITE_BUILDER_ADDON,
 )
-from .presets import get_preset_description
+from supertask.presets import get_preset_description
 
 logger = logging.getLogger('supertask.loop')
 

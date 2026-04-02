@@ -11,10 +11,10 @@ try:
 except ImportError:
     HAS_DND = False
 
-from .constants import APP_NAME, ICON_PATH, find_claude_cli
-from .config_dialog import ConfigDialog
-from .launcher import launch
-from .monitor import MonitorWindow
+from supertask.constants import APP_NAME, ICON_PATH, find_claude_cli
+from supertask.config_dialog import ConfigDialog
+from supertask.launcher import launch
+from supertask.monitor import MonitorWindow
 
 
 def main():

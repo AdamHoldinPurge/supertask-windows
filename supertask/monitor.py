@@ -11,8 +11,8 @@ import threading
 import tkinter as tk
 from tkinter import ttk, messagebox
 
-from .constants import APP_NAME, IS_WINDOWS
-from .process_manager import kill_process_tree
+from supertask.constants import APP_NAME, IS_WINDOWS
+from supertask.process_manager import kill_process_tree
 
 
 def _format_time(seconds):

@@ -4,7 +4,7 @@ import sys
 import json
 import subprocess
 from pathlib import Path
-from .constants import (ACCOUNTS_FILE, ACCOUNTS_DIR, CONFIG_BASE,
+from supertask.constants import (ACCOUNTS_FILE, ACCOUNTS_DIR, CONFIG_BASE,
                         DEFAULT_CLAUDE_CONFIG, IS_WINDOWS, find_claude_cli)
 
 

@@ -18,11 +18,11 @@ import tkinter as tk
 from tkinter import messagebox
 import tkinter.ttk as ttk
 
-from .constants import find_claude_cli, DEFAULT_TIMEOUT, ICON_PATH, IS_WINDOWS
-from .process_manager import check_existing_session
-from .prompts import build_init_prompt, build_creative_injection, build_brief_addon
-from .presets import get_preset_description
-from .loop_engine import LoopEngine
+from supertask.constants import find_claude_cli, DEFAULT_TIMEOUT, ICON_PATH, IS_WINDOWS
+from supertask.process_manager import check_existing_session
+from supertask.prompts import build_init_prompt, build_creative_injection, build_brief_addon
+from supertask.presets import get_preset_description
+from supertask.loop_engine import LoopEngine
 
 
 # ---------------------------------------------------------------------------

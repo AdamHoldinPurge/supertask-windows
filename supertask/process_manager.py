@@ -5,7 +5,7 @@ import hashlib
 import time
 import psutil
 from pathlib import Path
-from .constants import LOCK_DIR, IS_WINDOWS
+from supertask.constants import LOCK_DIR, IS_WINDOWS
 
 
 def get_lock_path(work_dir):

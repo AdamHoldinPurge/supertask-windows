@@ -2,7 +2,7 @@
 import tkinter as tk
 from tkinter import ttk
 
-from .presets import PRESET_NAMES, PRESET_DESCRIPTIONS
+from supertask.presets import PRESET_NAMES, PRESET_DESCRIPTIONS
 
 
 class PresetPickerDialog(tk.Toplevel):

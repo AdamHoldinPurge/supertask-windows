@@ -3,16 +3,16 @@ import os
 import tkinter as tk
 from tkinter import ttk, filedialog, messagebox
 
-from .constants import (
+from supertask.constants import (
     MODEL_OPTIONS, MODE_OPTIONS, MAX_CYCLES_OPTIONS, MAX_ITERS_OPTIONS,
     TIME_LIMIT_OPTIONS, TIME_LIMIT_MAP, ICON_PATH,
 )
-from .accounts import (
+from supertask.accounts import (
     get_accounts, login_new_account, find_next_slot,
     get_login_command, save_account,
 )
-from .preset_picker import pick_preset
-from .website_brief import WebsiteBriefDialog
+from supertask.preset_picker import pick_preset
+from supertask.website_brief import WebsiteBriefDialog
 
 
 # ---------------------------------------------------------------------------

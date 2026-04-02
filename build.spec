@@ -17,7 +17,7 @@ except ImportError:
     tkdnd_data = []
 
 a = Analysis(
-    ['supertask/main.py'],
+    ['launch.py'],
     pathex=[],
     binaries=[],
     datas=[

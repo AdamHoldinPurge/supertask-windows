@@ -1,0 +1,86 @@
+name: Build Windows Installer
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Build with PyInstaller
+        run: pyinstaller build.spec
+
+      - name: Verify PyInstaller output
+        run: |
+          if (Test-Path "dist\SuperTask\SuperTask.exe") {
+            Write-Host "BUILD SUCCESS: SuperTask.exe found"
+            Get-ChildItem dist\SuperTask | Measure-Object | Select-Object -ExpandProperty Count | ForEach-Object { Write-Host "Files in dist: $_" }
+          } else {
+            Write-Host "BUILD FAILED: SuperTask.exe not found"
+            exit 1
+          }
+
+      - name: Build installer with Inno Setup
+        uses: Minionguyjpro/Inno-Setup-Action@v1.2.2
+        with:
+          path: installer.iss
+
+      - name: Verify installer output
+        run: |
+          if (Test-Path "output\SuperTask-Setup-1.0.0.exe") {
+            $size = (Get-Item "output\SuperTask-Setup-1.0.0.exe").Length / 1MB
+            Write-Host "INSTALLER SUCCESS: SuperTask-Setup-1.0.0.exe ($([math]::Round($size, 1)) MB)"
+          } else {
+            Write-Host "INSTALLER FAILED: Setup exe not found"
+            Get-ChildItem output -ErrorAction SilentlyContinue
+            exit 1
+          }
+
+      - name: Upload installer artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: SuperTask-Setup
+          path: output/SuperTask-Setup-1.0.0.exe
+
+      - name: Create GitHub Release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: output/SuperTask-Setup-1.0.0.exe
+          generate_release_notes: true
+          body: |
+            ## SuperTask™ Windows Edition v1.0.0
+
+            ### Installation
+            1. Download `SuperTask-Setup-1.0.0.exe` below
+            2. Run the installer
+            3. If Windows SmartScreen warns you, click "More info" → "Run anyway"
+
+            ### Prerequisites
+            - [Node.js](https://nodejs.org) (v18+)
+            - Claude Code CLI: `npm install -g @anthropic-ai/claude-code`
+
+            ### What's included
+            - Full SuperTask™ autonomous loop manager
+            - Config dialog with account management
+            - Multi-variant round-robin with creative presets
+            - Website Builder mode with visual brief
+            - Real-time monitor window
+            - Graceful stop with polish phase

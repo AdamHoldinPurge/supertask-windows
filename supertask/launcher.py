@@ -67,8 +67,9 @@ def _show_progress(parent, title, message):
     y = (sh - dh) // 2
     dialog.geometry(f'+{x}+{y}')
 
-    # Prevent closing via window manager
+    # Prevent closing via window manager and block parent interaction
     dialog.protocol('WM_DELETE_WINDOW', lambda: None)
+    dialog.grab_set()
 
     return dialog
 

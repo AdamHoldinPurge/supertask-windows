@@ -5,8 +5,8 @@
 [Setup]
 AppId={{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}
 AppName=SuperTask
-AppVersion=1.0.0
-AppVerName=SuperTask 1.0.0
+AppVersion=1.0.1
+AppVerName=SuperTask 1.0.1
 AppPublisher=SuperTask
 AppPublisherURL=https://github.com/adamholdin/supertask-windows
 AppSupportURL=https://github.com/adamholdin/supertask-windows/issues
@@ -14,7 +14,7 @@ DefaultDirName={autopf}\SuperTask
 DefaultGroupName=SuperTask
 AllowNoIcons=yes
 OutputDir=output
-OutputBaseFilename=SuperTask-Setup-1.0.0
+OutputBaseFilename=SuperTask-Setup-1.0.1
 Compression=lzma2/ultra64
 SolidCompression=yes
 WizardStyle=modern

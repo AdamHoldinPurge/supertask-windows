@@ -28,6 +28,64 @@ _PAD_Y = 4
 _ADD_ACCOUNT_LABEL = "+ Add Account\u2026"
 
 
+def _show_copyable_command(parent, title, message, command):
+    """Show a dialog with a copyable command and a Copy to Clipboard button.
+
+    Blocks until the user clicks OK.
+    """
+    dialog = tk.Toplevel(parent)
+    dialog.title(title)
+    dialog.transient(parent)
+    dialog.resizable(False, False)
+
+    frame = ttk.Frame(dialog, padding=16)
+    frame.pack(fill="both", expand=True)
+
+    msg_label = tk.Label(
+        frame, text=message, font=_FONT, anchor="w", justify="left",
+    )
+    msg_label.pack(fill="x", pady=(0, 8))
+
+    # Command in a readonly Entry for easy selection / copy
+    cmd_var = tk.StringVar(value=command)
+    cmd_entry = ttk.Entry(
+        frame, textvariable=cmd_var, state="readonly",
+        font=("Consolas", 9), width=max(50, len(command) + 2),
+    )
+    cmd_entry.pack(fill="x", pady=(0, 12))
+
+    btn_frame = ttk.Frame(frame)
+    btn_frame.pack(fill="x")
+
+    def _copy():
+        dialog.clipboard_clear()
+        dialog.clipboard_append(command)
+        copy_btn.configure(text="Copied!")
+        dialog.after(1500, lambda: copy_btn.configure(text="Copy to Clipboard"))
+
+    copy_btn = ttk.Button(btn_frame, text="Copy to Clipboard", command=_copy)
+    copy_btn.pack(side="left")
+
+    ok_btn = ttk.Button(
+        btn_frame, text="OK \u2014 I've logged in", command=dialog.destroy,
+    )
+    ok_btn.pack(side="right")
+
+    # Center on screen
+    dialog.update_idletasks()
+    dw = dialog.winfo_width()
+    dh = dialog.winfo_height()
+    sw = dialog.winfo_screenwidth()
+    sh = dialog.winfo_screenheight()
+    x = (sw - dw) // 2
+    y = (sh - dh) // 2
+    dialog.geometry(f"+{max(0, x)}+{max(0, y)}")
+
+    dialog.grab_set()
+    dialog.focus_set()
+    dialog.wait_window()
+
+
 class ConfigDialog(tk.Toplevel):
     """Modal configuration dialog for launching a SuperTask session."""
 
@@ -483,11 +541,11 @@ class ConfigDialog(tk.Toplevel):
         config_dir = login_new_account(slot)
         command = get_login_command(config_dir)
 
-        messagebox.showinfo(
+        _show_copyable_command(
+            self,
             "Login Required",
-            f"Run this command in a terminal:\n\n{command}\n\n"
-            "Click OK when login is complete.",
-            parent=self,
+            "Run this command in a terminal, then click OK:",
+            command,
         )
 
         # Directly probe the NEW config dir (not a generic refresh,
@@ -690,16 +748,18 @@ class ConfigDialog(tk.Toplevel):
     # ------------------------------------------------------------------
 
     def _on_launch(self):
-        """Validate and close with result."""
+        """Validate and signal ready (dialog stays visible for init progress)."""
         if not self._validate():
             return
         self.result = self.get_config()
-        self.destroy()
+        self.grab_release()
+        self._done_var.set(True)
 
     def _on_cancel(self):
-        """Close without result."""
+        """Hide without result."""
         self.result = None
-        self.destroy()
+        self.withdraw()
+        self._done_var.set(True)
 
     # ------------------------------------------------------------------
     # Public API
@@ -707,5 +767,7 @@ class ConfigDialog(tk.Toplevel):
 
     def show(self):
         """Display the dialog modally and return the config dict or None."""
-        self.wait_window()
+        self._done_var = tk.BooleanVar(value=False)
+        self.protocol("WM_DELETE_WINDOW", self._on_cancel)
+        self.wait_variable(self._done_var)
         return self.result

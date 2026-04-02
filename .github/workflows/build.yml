@@ -47,9 +47,9 @@ jobs:
 
       - name: Verify installer output
         run: |
-          if (Test-Path "output\SuperTask-Setup-1.0.0.exe") {
-            $size = (Get-Item "output\SuperTask-Setup-1.0.0.exe").Length / 1MB
-            Write-Host "INSTALLER SUCCESS: SuperTask-Setup-1.0.0.exe ($([math]::Round($size, 1)) MB)"
+          if (Test-Path "output\SuperTask-Setup-1.0.1.exe") {
+            $size = (Get-Item "output\SuperTask-Setup-1.0.1.exe").Length / 1MB
+            Write-Host "INSTALLER SUCCESS: SuperTask-Setup-1.0.1.exe ($([math]::Round($size, 1)) MB)"
           } else {
             Write-Host "INSTALLER FAILED: Setup exe not found"
             Get-ChildItem output -ErrorAction SilentlyContinue
@@ -60,19 +60,19 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: SuperTask-Setup
-          path: output/SuperTask-Setup-1.0.0.exe
+          path: output/SuperTask-Setup-1.0.1.exe
 
       - name: Create GitHub Release
         if: startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v2
         with:
-          files: output/SuperTask-Setup-1.0.0.exe
+          files: output/SuperTask-Setup-1.0.1.exe
           generate_release_notes: true
           body: |
-            ## SuperTask™ Windows Edition v1.0.0
+            ## SuperTask™ Windows Edition v1.0.1
 
             ### Installation
-            1. Download `SuperTask-Setup-1.0.0.exe` below
+            1. Download `SuperTask-Setup-1.0.1.exe` below
             2. Run the installer
             3. If Windows SmartScreen warns you, click "More info" → "Run anyway"
 

@@ -49,11 +49,17 @@ def main():
     config = dialog.show()
 
     if config is None:
+        if dialog.winfo_exists():
+            dialog.destroy()
         root.destroy()
         sys.exit(0)
 
-    # ── 4. Launch ────────────────────────────────────────────────────
-    engine = launch(root, config)
+    # ── 4. Launch (dialog stays visible as parent for progress) ───
+    engine = launch(dialog, config)
+
+    # Clean up the config dialog
+    if dialog.winfo_exists():
+        dialog.destroy()
 
     if engine is None:
         root.destroy()

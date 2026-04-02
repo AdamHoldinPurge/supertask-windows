@@ -23,6 +23,8 @@ SetupIconFile=supertask\icon.ico
 UninstallDisplayIcon={app}\SuperTask.exe
 ArchitecturesInstallIn64BitMode=x64compatible
 MinVersion=10.0
+CloseApplications=yes
+RestartApplications=no
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
@@ -50,19 +52,7 @@ begin
   Result := True;
 
   // Check if Node.js is installed (required for claude CLI)
-  if not Exec('cmd.exe', '/c node --version', '', SW_HIDE, ewWaitUntilTerminated, ResultCode) then
-  begin
-    if MsgBox('SuperTask requires Node.js and the Claude Code CLI to function.' + #13#10 + #13#10 +
-              'Node.js was not detected on this system.' + #13#10 + #13#10 +
-              'You can install Node.js from https://nodejs.org' + #13#10 +
-              'Then run: npm install -g @anthropic-ai/claude-code' + #13#10 + #13#10 +
-              'Continue with installation anyway?',
-              mbConfirmation, MB_YESNO) = IDNO then
-    begin
-      Result := False;
-    end;
-  end
-  else if ResultCode <> 0 then
+  if not Exec('cmd.exe', '/c node --version', '', SW_HIDE, ewWaitUntilTerminated, ResultCode) or (ResultCode <> 0) then
   begin
     if MsgBox('SuperTask requires Node.js and the Claude Code CLI to function.' + #13#10 + #13#10 +
               'Node.js was not detected on this system.' + #13#10 + #13#10 +
